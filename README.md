@@ -111,7 +111,7 @@ dev_inject_plugin { "dir": "D:/dshSessions/offpeak-send/dsh-offpeak-send" }
 - **host**（`lib/index.js`、`outbox.js`、`deliver.js`、`gc.js`）：重启 DSH，或 `dev_reload_package("dsh-offpeak-send")`（清缓存、重建 fiber）。
 - **client**（`lib/client.js`）：刷新浏览器页面。注意浏览器会按 URL 缓存 `/plugins/??…` 合并 bundle，直接刷新可能仍跑旧代码（本次实测踩过：页面显示高峰、发送却直通不排队）。排查/验证时用带时间戳的地址重开，例如在页面里 `location.href = 'http://127.0.0.1:3080/?cb=' + Date.now()`，再确认行为变化。
 
-**注入器坑**：注入器的 slot 白名单（`D:/dsh-plugins/injector-dist/lib/index.js` 的 `clientSkeletonProblems`，`:8502-8517`）记忆的是启动时的值；改文件后 `dev_reload_package("dsh-super-injector")` 不会让它重新读取，必须重启 DSH。现已在 `:8511-8513` 补入 `conversation.input.right/left/permission`（重启后生效）。client bundle 里仍保留一个合法 slot 的单行锚点（`ctx.slots.register({ name: 'shell.overlay', id: 'offpeak-anchor', order: 900 }, () => null)`，返回 null 不渲染）作为兜底；确认白名单已生效后可删。
+**注入器坑**：注入器的 slot 白名单（`D:/dsh-plugins/injector-dist/lib/index.js` 的 `clientSkeletonProblems`，`:8502-8517`）记忆的是启动时的值；改文件后 `dev_reload_package("dsh-super-injector")` 不会让它重新读取，必须重启 DSH。现已在 `:8511-8513` 补入 `conversation.input.right/left/permission`（重启后生效）。client bundle 用 `shell.overlay` 作为合法锚点，同时承载设置面板/关闭对话框（`OverlayHost`）：这层在 frame root，不会被 composer 的 transform/filter 盖住；不要再把它改回返回 null 的占位。
 
 ## 测试
 
