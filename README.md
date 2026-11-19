@@ -1,16 +1,22 @@
 # 谷时发送（dsh-offpeak-send）
 
+> **这是 ATMxsp01 维护的 fork，版本 0.2.0。** 基于上游 `@carbonzhao/dsh-offpeak-send@0.1.1`（MIT）。
+> 上游 PR #3（2027 节假日）与 #4（per-session）作为历史提案保留；本 fork 从 0.2.0 起独立维护，不再跟随 upstream。
+> 本部署安装：profile `link:/opt/dsh/plugins/dsh-offpeak-send`；完整运维见 `docs/offpeak-send.zh.md`。
+
 DeepSeek 计价分高峰与谷时（谷时半价）。这个插件在输入框权限选择模块的右侧加一个开关：开启后，按发送时如果正处高峰，消息不立即发出，而是排队到下一个谷时开始后 3 秒自动投递；处于谷时则照常立即发送。
 
-当前状态：已在 DSH Web 0.2.1-rc.5 上真机验收通过——入口位置、排队、倒计时、立即发送、修改、取消、关闭开关三按钮弹窗、到点自动投递、设置面板、附件落盘、自动清理全部实测。
+当前状态：已在 DSH Web 0.2.2-rc.5 上验证——per-session 开关（默认 + 每会话覆盖，宿主 `session-prefs.json` 持久化）、2027 节假日、设置面板/对话框 `shell.overlay`、排队/倒计时/立即发送/修改/取消、wrapper 拦截全部实测；到点自动投递沿用上游 0.2.1-rc.5 的验收与测试。
 
+```bash
+# 本部署（profile link）
+dsh plugin --profile web add link:/opt/dsh/plugins/dsh-offpeak-send
+# 或插件管理器：install_bundle target=/opt/dsh/plugins/dsh-offpeak-send
 ```
-npm i @carbonzhao/dsh-offpeak-send
-```
 
-安装后重启 `dsh web`，输入框权限选择模块右侧会出现「谷时」开关。
+安装后重启 `dsh web`（或插件管理器热加载），输入框权限选择模块右侧会出现「谷时」开关。
 
-English: adds an "off-peak" toggle to the DSH composer. When enabled, pressing send during DeepSeek's peak billing hours (Mon–Fri 09:00–12:00 / 14:00–18:00 Beijing time) queues the message and delivers it 3 s after the next off-peak window starts (off-peak costs 50% of peak). A dock above the composer shows the pending items, countdown, and per-item send-now / edit / cancel; the queue survives closing the browser or restarting DSH, attachments included.
+English: a maintained fork of the off-peak send queue for DSH (v0.2.0). It adds a per-session off-peak toggle (host-persisted default plus per-session overrides), queues messages sent during DeepSeek's peak hours and delivers them 3 s after the next off-peak window starts, and includes the 2027 Chinese statutory holidays. A dock above the composer shows pending items, countdown, and per-item send-now / edit / cancel; the queue survives browser close and DSH restart, attachments included.
 
 ## 计价时间模型
 
