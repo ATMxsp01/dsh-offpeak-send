@@ -21,9 +21,9 @@ English: adds an "off-peak" toggle to the DSH composer. When enabled, pressing s
 | 时区 | 固定 UTC+8，只用 UTC getter + 固定偏移换算，不读浏览器本地小时 |
 | 延迟点 | 谷时起点 + buffer（默认 3 秒，可配 1–10 秒） |
 | 最长等待 | 约 4 小时（14:00 按下，18:00:03 投递） |
-| 节假日表 | `lib/core/holidays.js`，2026 年 33 天放假（国办发明电〔2025〕7 号）；未列年份按普通工作日处理 |
+| 节假日表 | `lib/core/holidays.js`，2026 年 33 天 + 2027 年 29 天放假（国办发明电〔2025〕7 号、〔2026〕10 号）；未列年份按普通工作日处理 |
 
-2026 年节日按官方通知只登记放假日；调休上班的周六按谷时处理（只会多等、不会多付）。
+2026/2027 年节日按官方通知只登记放假日；调休上班的周六按谷时处理（只会多等、不会多付）。
 
 ## 前端行为
 
@@ -116,13 +116,13 @@ dev_inject_plugin { "dir": "D:/dshSessions/offpeak-send/dsh-offpeak-send" }
 ## 测试
 
 ```bash
-npm test    # 56 例全绿
+npm test    # 58 例全绿
 ```
 
-- `test/clock.test.mjs`（9）：相位边界 8:59:59 / 9:00 / 11:59:59 / 12:00 / 13:59:59 / 14:00 / 17:59:59 / 18:00、周末与节假日、调休周六、跨日与跨周末的 nextOffpeakStart/nextPeakStart、sendAt 落点不变（7 天每 7 分钟采样 + 边界 ±1 ms：落点必为谷时、等待 ≤ 4h + buffer）、buffer 钳制、时区固定。
+- `test/clock.test.mjs`（10）：相位边界 8:59:59 / 9:00 / 11:59:59 / 12:00 / 13:59:59 / 14:00 / 17:59:59 / 18:00、周末与 2026/2027 节假日、调休周六、跨日与跨周末的 nextOffpeakStart/nextPeakStart、sendAt 落点不变（7 天每 7 分钟采样 + 边界 ±1 ms：落点必为谷时、等待 ≤ 4h + buffer）、buffer 钳制、时区固定。
 - `test/outbox.test.mjs`（19）：FIFO、状态机、clientTag 幂等、退避、崩溃恢复、容量上限。
 - `test/gc-refs.test.mjs`（18）：引用核对（zstd 帧扫描、缓存失效）、候选筛选、rename/恢复/过期删除、安全阀与失败即停。
-- `test/client-inline.test.mjs`（3）：内联块存在且与源文件一致（重跑幂等）、client bundle 可解析。
+- `test/client-inline.test.mjs`（4）：内联块存在且与源文件一致（重跑幂等）、client bundle 可解析、2027 节假日采样。
 - `test/prefs.test.mjs`（7）：默认/覆盖归一化、effective 回退、`sessionPrefsView`、有排队时禁止关闭会话/默认、非法输入。
 
 ## 端到端自测（造高峰）
@@ -149,7 +149,7 @@ curl -X POST -H 'content-type: application/json' \
 - 单附件 32 MB、单条 20 个附件、全局队列 100 条 / 单会话 20 条（超限返回 429 queue-full）。
 - 模型是否支持图像靠模型名启发式匹配，可能误判。
 - 取消/清除/丢图产生的附件孤儿最长要 7 天才会真正释放磁盘（隔离区窗口），期间可以在设置面板里恢复。
-- 节假日表只覆盖 2026；后续年份需按官方通知补 `lib/core/holidays.js`（缺省按工作日，只会多等不多付）。
+- 节假日表覆盖 2026–2027；后续年份需按官方通知补 `lib/core/holidays.js`（缺省按工作日，只会多等不多付）。
 - 旧版全局 localStorage 开关不再读取；升级后宿主默认开启，已有自定义的用户需要在设置面板重设一次「新会话默认」。
 - 会话开关由宿主文件持久化，跨浏览器/设备一致；另一台设备上的变化最多 3 秒（页面隐藏 10 秒）后反映，不是实时推送。
 - 有排队消息的会话不能被关闭；默认关闭时若还有未固定的排队会话，宿主拒绝 409。这样不会出现「会话在排队但谷时模式是关的」。
