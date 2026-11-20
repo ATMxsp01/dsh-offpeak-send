@@ -1,12 +1,12 @@
 # 谷时发送（dsh-offpeak-send）
 
-> **这是 ATMxsp01 维护的 fork，版本 0.2.0。** 基于上游 `@carbonzhao/dsh-offpeak-send@0.1.1`（MIT）。
+> **这是 ATMxsp01 维护的 fork，版本 0.2.1。** 基于上游 `@carbonzhao/dsh-offpeak-send@0.1.1`（MIT）。
 > 上游 PR #3（2027 节假日）与 #4（per-session）作为历史提案保留；本 fork 从 0.2.0 起独立维护，不再跟随 upstream。
 > 本部署安装：profile `link:/opt/dsh/plugins/dsh-offpeak-send`；完整运维见 `docs/offpeak-send.zh.md`。
 
 DeepSeek 计价分高峰与谷时（谷时半价）。这个插件在输入框权限选择模块的右侧加一个开关：开启后，按发送时如果正处高峰，消息不立即发出，而是排队到下一个谷时开始后 3 秒自动投递；处于谷时则照常立即发送。
 
-当前状态：已在 DSH Web 0.2.2-rc.5 上验证——per-session 开关（默认 + 每会话覆盖，宿主 `session-prefs.json` 持久化）、2027 节假日、设置面板/对话框 `shell.overlay`、排队/倒计时/立即发送/修改/取消、wrapper 拦截全部实测；到点自动投递沿用上游 0.2.1-rc.5 的验收与测试。
+当前状态：已在 DSH Web 0.2.2-rc.5 上验证——per-session 开关（默认 + 每会话覆盖，宿主 `session-prefs.json` 持久化）、2027 节假日、设置面板/对话框 `shell.overlay`、排队/倒计时/立即发送/修改/取消、wrapper 拦截全部实测；0.2.1 把「谷时排队」dock 收窄到 composer 列内（不再横跨内容区）；到点自动投递沿用上游 0.2.1-rc.5 的验收与测试。
 
 ```bash
 # 本部署（profile link）

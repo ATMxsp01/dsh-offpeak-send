@@ -1,6 +1,6 @@
 {
   "name": "@carbonzhao/dsh-offpeak-send",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Queue messages to DeepSeek off-peak (half-price) hours — 谷时发送：per-session toggle, host-persisted session prefs, 2027 holidays; maintained fork",
   "type": "module",
   "main": "./lib/index.js",
